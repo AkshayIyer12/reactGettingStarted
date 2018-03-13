@@ -540,13 +540,25 @@
             filterText: '',
             inStockOnly: false
           }
-        } 
+        }
+        handleFilterTextChange = filterText => {
+          this.setState({
+            filterText: filterText
+          })
+        }
+        handleInStockChange = inStockOnly => {
+          this.setState({
+            inStockOnly: inStockOnly
+          })
+        }
         render = () => {
           return (
             <div>
               <SearchBar 
                 filterText={this.state.filterText} 
                 inStockOnly={this.state.inStockOnly}
+                onFilterTextChange={this.handleFilterTextChange}
+                onInStockChange={this.handleInStockChange}
               />
               <ProductTable 
                 products={this.props.products} 
@@ -558,13 +570,22 @@
         }
       }
       class SearchBar extends React.Component {
+        constructor(props) {
+          super(props)
+        }
+        handleFilterTextChange = e => {
+          this.props.onFilterTextChange(e.target.value)
+        }
+        handleInStockChange = e => {
+          this.props.onInStockChange(e.target.checked)
+        }
         render = () => {
           const {filterText, inStockOnly} = this.props
           return (
             <form>
-              <input type="text" placeholder="Search..." value={filterText} /><br />
+              <input type="text" placeholder="Search..." value={filterText} onChange={this.handleFilterTextChange}/><br />
               <p>
-                <input type="checkbox" checked={inStockOnly} />
+                <input type="checkbox" checked={inStockOnly} onChange={this.handleInStockChange}/>
                 {' '}
                 Only show products in stock
               </p>
@@ -583,7 +604,6 @@
         if (product.category !== accum.lastCategory) { 
           minArr.push(<ProductCategoryRow category={product.category} key={product.category} />)
         }
-        console.log(accum) 
         accum.lastCategory = product.category 
         minArr.push(<ProductRow product={product} key={product.name} />) 
         accum.majArr.push(minArr) 
@@ -625,7 +645,7 @@
       }
       class ProductRow extends React.Component {
         render = () => {
-          const product = this.props.product
+          const { product } = this.props
           const name = product.stocked ? product.name : <span style={{color: 'red'}}>{product.name}</span>
           return (
             <tr>
